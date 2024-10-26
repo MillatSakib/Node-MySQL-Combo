@@ -35,7 +35,10 @@ app.get("/test", (req, res) => {
 
 })
 
+
+//get all data from a database table
 app.get("/studentData", (req, res) => {
+    //we can also specify which column I want to add by replacing * bu the column names
     con.query("SELECT * FROM vugijugi.students", (err, data) => {
         if (err) {
             console.log(err);
@@ -60,6 +63,49 @@ app.get("/studentData", (req, res) => {
         });
     });
 });
+
+
+//Get a student by its roll number
+app.get("/getstudentbyid/:id", async (req, res) => {
+    try {
+        const studentID = req.params.id;
+        if (!studentID) {
+            return res.status(404).send({
+                success: false,
+                message: "Invalid Student ID."
+            })
+        }
+
+        con.query(`SELECT * FROM vugijugi.students WHERE Roll=` + studentID, (err, data) => {
+            if (err) {
+                console.log(`SELECT * FROM vugijugi.students WHERE Roll =` + studentID);
+                return res.status(500).send({
+                    success: false,
+                    message: "An error occurred while fetching data"
+                });
+            }
+
+            if (data.length === 0) {
+                return res.status(404).send({
+                    success: false,
+                    message: "No records found"
+                });
+            }
+
+            res.status(200).send({
+                success: true,
+                data: data
+            });
+        });
+    } catch (e) {
+        console.log(e);
+        res.status(500).send({
+            success: false,
+            message: "Error in Get student by id API",
+            error: e.message
+        })
+    }
+})
 
 
 //port 
