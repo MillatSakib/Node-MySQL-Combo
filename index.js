@@ -35,6 +35,33 @@ app.get("/test", (req, res) => {
 
 })
 
+app.get("/studentData", (req, res) => {
+    con.query("SELECT * FROM vugijugi.students", (err, data) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send({
+                success: false,
+                message: "An error occurred while fetching data"
+            });
+        }
+
+        if (data.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: "No records found"
+            });
+        }
+
+        res.status(200).send({
+            success: true,
+            message: "All Students records",
+            totalStudents: data.length,
+            data: data
+        });
+    });
+});
+
+
 //port 
 const port = process.env.PORT;
 
